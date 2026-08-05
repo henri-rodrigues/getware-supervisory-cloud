@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #181C22;
+    color: #F1F5F9;
+  }
+}
+
+/* Custom SCADA Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #181C22;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3A4554;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Piping Flow Animation */
+.pipe-flow-active {
+  stroke-dasharray: 8, 4;
+  animation: pipeFlow 1.5s linear infinite;
+}
+
+@keyframes pipeFlow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
