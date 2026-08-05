@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { useSupervisoryStore } from '../../store/useSupervisoryStore';
 import { Tag, AlarmSeverity } from '../../types';
-import { Flame, Droplets, Gauge, Activity, Power, Sliders, AlertTriangle, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Flame, Droplets, Gauge, Activity, Power, Sliders, RefreshCw, CheckCircle2 } from 'lucide-react';
 
 export const SynopticCanvas: React.FC = () => {
-  const { tags, writeTagValue, alarms, isSimulatingTelemetry, toggleSimulation } = useSupervisoryStore();
+  const { tags, writeTagValue, isSimulatingTelemetry, toggleSimulation } = useSupervisoryStore();
   const [selectedTagForWrite, setSelectedTagForWrite] = useState<Tag | null>(null);
   const [writeInputValue, setWriteInputValue] = useState<string>('');
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
-  // Helper to find tag by ID or Name
   const getTag = (name: string) => tags.find(t => t.name === name) || tags[0];
 
   const tempTag = getTag('Temperatura_Forno_01');
@@ -29,7 +28,6 @@ export const SynopticCanvas: React.FC = () => {
 
   const tempAlarmState = getAlarmState(tempTag);
   const pressAlarmState = getAlarmState(pressTag);
-  const levelAlarmState = getAlarmState(levelTag);
 
   const handleOpenWriteModal = (tag: Tag) => {
     if (tag.accessType !== 'READ_WRITE') return;
@@ -53,30 +51,30 @@ export const SynopticCanvas: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto select-none">
+    <div className="bg-white text-slate-800 p-6 space-y-6 max-w-7xl mx-auto font-sans min-h-screen select-none">
       {/* Header Banner ISA-101 */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-isa-surface border border-isa-border p-4 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-slate-200 p-4 rounded-xl shadow-xs">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="font-display font-bold text-xl text-slate-100">Sinóptico ISA-101 • Planta de Indução</h1>
-            <span className="bg-sky-950 text-sky-400 text-xs px-2 py-0.5 rounded border border-sky-800 font-mono">
+            <h1 className="font-bold text-xl text-slate-900">Sinóptico HMI • Mapa da Planta</h1>
+            <span className="bg-sky-100 text-sky-800 text-xs px-2 py-0.5 rounded font-semibold">
               Processo Ativo
             </span>
           </div>
-          <p className="text-xs text-isa-muted mt-0.5">
-            Monitoramento SCADA em tempo real conforme norma ISA-101 (Fundo Cinza Neutro Situacional).
+          <p className="text-xs text-slate-500 mt-0.5">
+            Monitoramento SCADA em tempo real (Norma ISA-101 Situational Awareness).
           </p>
         </div>
 
         <div className="flex items-center space-x-3 text-xs">
-          <div className="flex items-center space-x-2 bg-isa-bg border border-isa-border px-3 py-1.5 rounded-lg font-mono">
-            <RefreshCw className={`w-3.5 h-3.5 ${isSimulatingTelemetry ? 'animate-spin text-sky-400' : 'text-amber-400'}`} />
-            <span className="text-isa-muted">Polling 10Hz:</span>
-            <span className="font-semibold text-slate-200">{isSimulatingTelemetry ? 'Ativo' : 'Pausado'}</span>
+          <div className="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg font-mono">
+            <RefreshCw className={`w-3.5 h-3.5 ${isSimulatingTelemetry ? 'animate-spin text-sky-600' : 'text-amber-500'}`} />
+            <span className="text-slate-500">Polling 10Hz:</span>
+            <span className="font-bold text-slate-800">{isSimulatingTelemetry ? 'Ativo' : 'Pausado'}</span>
           </div>
           <button
             onClick={toggleSimulation}
-            className="px-3 py-1.5 rounded-lg bg-isa-panel hover:bg-isa-hover border border-isa-border text-slate-200 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-medium transition-colors"
           >
             {isSimulatingTelemetry ? 'Pausar' : 'Retomar'}
           </button>
@@ -85,26 +83,21 @@ export const SynopticCanvas: React.FC = () => {
 
       {/* Success Toast Notification */}
       {showSuccessToast && (
-        <div className="bg-emerald-950/80 border border-emerald-500 text-emerald-300 p-3 rounded-lg flex items-center space-x-2 text-xs font-semibold animate-bounce">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 p-3 rounded-lg flex items-center space-x-2 text-xs font-semibold animate-bounce shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>Comando de Escrita enviado com sucesso ao CLP Modbus/MQTT!</span>
         </div>
       )}
 
       {/* ISA-101 SCADA CANVAS GRAPHICS AREA */}
-      <div className="bg-[#1C2229] border border-isa-border rounded-xl p-6 relative overflow-hidden min-h-[500px]">
-        {/* Subtle ISA Grid Overlay */}
-        <div 
-          className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-          style={{ backgroundImage: 'radial-gradient(#94A3B8 1px, transparent 1px)', backgroundSize: '24px 24px' }}
-        />
-
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 relative overflow-hidden min-h-[500px] shadow-xs">
+        
         {/* Legend ISA-101 Standard */}
-        <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-isa-muted mb-6 pb-4 border-b border-isa-border/60">
-          <span className="font-semibold text-slate-300">Norma ISA-101 Legend:</span>
+        <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-slate-600 mb-6 pb-4 border-b border-slate-200">
+          <span className="font-bold text-slate-800">ISA-101 Standard Legend:</span>
           <div className="flex items-center space-x-1.5">
-            <span className="w-3 h-3 rounded bg-slate-500" />
-            <span>Normal (Desaturado)</span>
+            <span className="w-3 h-3 rounded bg-slate-400" />
+            <span>Normal</span>
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-3 h-3 rounded bg-sky-500" />
@@ -112,11 +105,11 @@ export const SynopticCanvas: React.FC = () => {
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-3 h-3 rounded bg-amber-500" />
-            <span>Advertência (H/L)</span>
+            <span>Advertência</span>
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-3 h-3 rounded bg-red-600 animate-pulse" />
-            <span>Alarme Crítico (HH/LL)</span>
+            <span>Alarme Crítico</span>
           </div>
         </div>
 
@@ -126,167 +119,132 @@ export const SynopticCanvas: React.FC = () => {
           {/* Equipment 1: Forno de Indução Principal */}
           <div className={`p-5 rounded-xl border transition-all ${
             tempAlarmState === 'CRITICAL_HH'
-              ? 'bg-red-950/30 border-red-500 shadow-lg shadow-red-950/50 animate-alarm-flash'
+              ? 'bg-red-50 border-red-500 shadow-md'
               : tempAlarmState === 'WARNING_H'
-              ? 'bg-amber-950/20 border-amber-500/80'
-              : 'bg-isa-surface border-isa-border'
+              ? 'bg-amber-50 border-amber-400'
+              : 'bg-white border-slate-200 shadow-xs'
           }`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-2">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                  tempAlarmState === 'CRITICAL_HH' ? 'bg-red-600 text-white' : 'bg-slate-700 text-amber-400'
+                  tempAlarmState === 'CRITICAL_HH' ? 'bg-red-600 text-white' : 'bg-slate-100 text-amber-500 border border-slate-300'
                 }`}>
                   <Flame className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold text-sm text-slate-100">Forno de Indução 01</h3>
-                  <p className="text-[10px] text-isa-muted font-mono">Modbus ID: 40001 (CLP Forno)</p>
+                  <h3 className="font-bold text-sm text-slate-900">Forno de Indução 01</h3>
+                  <p className="text-[10px] text-slate-500 font-mono">Modbus ID: 40001</p>
                 </div>
               </div>
               
               <button
                 onClick={() => handleOpenWriteModal(tempTag)}
-                className="px-2 py-1 bg-isa-panel hover:bg-isa-hover border border-isa-border rounded text-[11px] font-mono text-sky-400 flex items-center space-x-1"
-                title="Alterar Setpoint de Temperatura"
+                className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[11px] font-medium text-slate-700 flex items-center space-x-1"
               >
-                <Sliders className="w-3 h-3" />
+                <Sliders className="w-3 h-3 text-slate-500" />
                 <span>Ajustar</span>
               </button>
             </div>
 
             {/* Visual Furnace Box */}
-            <div className="h-32 bg-slate-900/80 border border-slate-700 rounded-lg flex flex-col items-center justify-center relative overflow-hidden my-3">
-              <div className={`absolute bottom-0 w-full transition-all duration-500 ${
-                tempAlarmState === 'CRITICAL_HH' ? 'bg-red-600/30 h-full' : 'bg-gradient-to-t from-amber-500/20 to-transparent h-2/3'
-              }`} />
+            <div className="h-32 bg-slate-100 border border-slate-200 rounded-lg flex flex-col items-center justify-center relative overflow-hidden my-3">
               <Flame className={`w-12 h-12 mb-1 transition-all ${
-                tempAlarmState === 'CRITICAL_HH' ? 'text-red-500 animate-bounce' : 'text-amber-400'
+                tempAlarmState === 'CRITICAL_HH' ? 'text-red-500 animate-bounce' : 'text-amber-500'
               }`} />
-              <span className="text-[10px] font-mono text-slate-400">Zona de Fusão 850°C Max</span>
+              <span className="text-[10px] font-mono text-slate-500">Zona de Fusão 850°C Max</span>
             </div>
 
             {/* Readout Display */}
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between font-mono">
-              <span className="text-xs text-slate-400">Temperatura Atual:</span>
+            <div className="bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between font-mono">
+              <span className="text-xs text-slate-600 font-medium">Temperatura Atual:</span>
               <div className="flex items-baseline space-x-1">
                 <span className={`text-2xl font-bold ${
-                  tempAlarmState === 'CRITICAL_HH' ? 'text-red-400' : tempAlarmState === 'WARNING_H' ? 'text-amber-400' : 'text-slate-100'
+                  tempAlarmState === 'CRITICAL_HH' ? 'text-red-600' : 'text-slate-900'
                 }`}>
                   {tempTag.currentValue}
                 </span>
-                <span className="text-xs text-sky-400 font-semibold">{tempTag.unit}</span>
-              </div>
-            </div>
-
-            {/* Setpoints Limits */}
-            <div className="mt-3 grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
-              <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                <span className="block text-slate-500">LL</span>
-                <span className="text-slate-300">{tempTag.alarmLL}</span>
-              </div>
-              <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                <span className="block text-slate-500">L</span>
-                <span className="text-slate-300">{tempTag.alarmL}</span>
-              </div>
-              <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                <span className="block font-semibold text-amber-400">H</span>
-                <span className="text-slate-300">{tempTag.alarmH}</span>
-              </div>
-              <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                <span className="block font-semibold text-red-400">HH</span>
-                <span className="text-slate-300">{tempTag.alarmHH}</span>
+                <span className="text-xs text-blue-600 font-bold">{tempTag.unit}</span>
               </div>
             </div>
           </div>
 
-          {/* Equipment 2: Pressão da Câmara & Tubulação de Fluxo */}
-          <div className={`p-5 rounded-xl border flex flex-col justify-between transition-all ${
-            pressAlarmState !== 'NORMAL' ? 'bg-amber-950/20 border-amber-500/80' : 'bg-isa-surface border-isa-border'
-          }`}>
+          {/* Equipment 2: Pressão da Câmara */}
+          <div className="p-5 rounded-xl border bg-white border-slate-200 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-lg bg-slate-700 text-sky-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-300 text-blue-600 flex items-center justify-center">
                     <Gauge className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-display font-semibold text-sm text-slate-100">Pressão da Câmara</h3>
-                    <p className="text-[10px] text-isa-muted font-mono">Modbus ID: 40003</p>
+                    <h3 className="font-bold text-sm text-slate-900">Pressão da Câmara</h3>
+                    <p className="text-[10px] text-slate-500 font-mono">Modbus ID: 40003</p>
                   </div>
                 </div>
               </div>
 
               {/* Gauge Display */}
-              <div className="my-4 bg-slate-950 p-4 rounded-lg border border-slate-800 text-center">
-                <p className="text-[10px] font-mono text-isa-muted uppercase mb-1">Manômetro Digital ISA-101</p>
-                <div className="text-3xl font-mono font-bold text-sky-400">
-                  {pressTag.currentValue} <span className="text-sm text-slate-400">{pressTag.unit}</span>
-                </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full mt-3 overflow-hidden">
-                  <div 
-                    className="bg-sky-500 h-full transition-all duration-300"
-                    style={{ width: `${Math.min(100, ((Number(pressTag.currentValue) || 0) / 10) * 100)}%` }}
-                  />
+              <div className="my-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-center">
+                <p className="text-[10px] font-mono text-slate-500 uppercase mb-1">Manômetro Digital</p>
+                <div className="text-3xl font-mono font-bold text-blue-600">
+                  {pressTag.currentValue} <span className="text-sm text-slate-500">{pressTag.unit}</span>
                 </div>
               </div>
             </div>
 
             {/* Active Piping Flow Visual */}
-            <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/80 flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-xs text-slate-300">
-                <Activity className="w-4 h-4 text-sky-400 animate-spin" />
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-xs text-slate-700 font-medium">
+                <Activity className="w-4 h-4 text-blue-600 animate-spin" />
                 <span>Linha Pneumática:</span>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+              <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
                 FLUXO OK
               </span>
             </div>
           </div>
 
-          {/* Equipment 3: Tanque de Refrigeração & Bomba */}
-          <div className="p-5 rounded-xl border bg-isa-surface border-isa-border flex flex-col justify-between">
+          {/* Equipment 3: Tanque de Refrigeração */}
+          <div className="p-5 rounded-xl border bg-white border-slate-200 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-lg bg-slate-700 text-sky-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-300 text-blue-600 flex items-center justify-center">
                     <Droplets className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-display font-semibold text-sm text-slate-100">Tanque de Refrigeração</h3>
-                    <p className="text-[10px] text-isa-muted font-mono">Tópico MQTT Gateway</p>
+                    <h3 className="font-bold text-sm text-slate-900">Tanque de Refrigeração</h3>
+                    <p className="text-[10px] text-slate-500 font-mono">MQTT Gateway</p>
                   </div>
                 </div>
               </div>
 
-              {/* Tank Level Bar Visual */}
               <div className="my-3 space-y-1">
                 <div className="flex justify-between text-xs font-mono">
-                  <span className="text-slate-400">Nível do Fluido:</span>
-                  <span className="font-bold text-sky-400">{levelTag.currentValue} %</span>
+                  <span className="text-slate-600">Nível do Fluido:</span>
+                  <span className="font-bold text-blue-600">{levelTag.currentValue} %</span>
                 </div>
-                <div className="h-24 bg-slate-950 rounded-lg border border-slate-800 p-1 flex items-end">
+                <div className="h-24 bg-slate-100 rounded-lg border border-slate-200 p-1 flex items-end">
                   <div 
-                    className="w-full bg-gradient-to-t from-sky-600 to-sky-400 rounded transition-all duration-500 relative"
+                    className="w-full bg-blue-500 rounded transition-all duration-500 relative"
                     style={{ height: `${Math.min(100, Math.max(5, Number(levelTag.currentValue) || 0))}%` }}
-                  >
-                    <div className="absolute inset-0 bg-white/10 animate-pulse" />
-                  </div>
+                  />
                 </div>
               </div>
             </div>
 
             {/* Circulation Pump Control Toggle */}
-            <div className="pt-3 border-t border-isa-border flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-xs font-mono">
-                <Power className={`w-4 h-4 ${pumpTag.currentValue ? 'text-emerald-400' : 'text-slate-500'}`} />
-                <span className="text-slate-300">Bomba Circuladora:</span>
+            <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-xs font-medium">
+                <Power className={`w-4 h-4 ${pumpTag.currentValue ? 'text-emerald-600' : 'text-slate-400'}`} />
+                <span className="text-slate-700">Bomba Circuladora:</span>
               </div>
               <button
                 onClick={() => handleOpenWriteModal(pumpTag)}
-                className={`px-3 py-1.5 rounded font-mono text-xs font-bold transition-all border ${
+                className={`px-3 py-1 rounded font-mono text-xs font-bold transition-all border ${
                   pumpTag.currentValue
-                    ? 'bg-emerald-950 text-emerald-400 border-emerald-700 hover:bg-emerald-900'
-                    : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
+                    : 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200'
                 }`}
               >
                 {pumpTag.currentValue ? 'LIGADA' : 'DESLIGADA'}
@@ -297,44 +255,33 @@ export const SynopticCanvas: React.FC = () => {
         </div>
       </div>
 
-      {/* Write Command Modal (Safe Operator Access) */}
+      {/* Write Command Modal */}
       {selectedTagForWrite && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-isa-surface border border-isa-border p-6 rounded-xl max-w-md w-full shadow-2xl space-y-4">
-            <div className="flex items-center space-x-2 text-sky-400">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-300 p-6 rounded-xl max-w-md w-full shadow-2xl space-y-4 text-slate-800">
+            <div className="flex items-center space-x-2 text-blue-600">
               <Sliders className="w-5 h-5" />
-              <h3 className="font-display font-bold text-lg text-slate-100">Comando de Escrita SCADA</h3>
+              <h3 className="font-bold text-lg text-slate-900">Comando de Escrita SCADA</h3>
             </div>
 
-            <p className="text-xs text-isa-muted">
-              Você está alterando o valor da variável <strong className="text-slate-200">{selectedTagForWrite.name}</strong> ({selectedTagForWrite.address}).
+            <p className="text-xs text-slate-600">
+              Você está alterando o valor da variável <strong className="text-slate-900">{selectedTagForWrite.name}</strong> ({selectedTagForWrite.address}).
             </p>
-
-            <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs space-y-1">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Valor Atual:</span>
-                <span className="text-sky-400 font-bold">{String(selectedTagForWrite.currentValue)} {selectedTagForWrite.unit}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Tipo de Dado:</span>
-                <span className="text-slate-300">{selectedTagForWrite.dataType}</span>
-              </div>
-            </div>
 
             {selectedTagForWrite.dataType === 'BOOLEAN' ? (
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
                   onClick={() => setWriteInputValue('true')}
-                  className={`py-2 rounded font-mono text-xs font-bold border transition-colors ${
-                    writeInputValue === 'true' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-slate-300 border-slate-700'
+                  className={`py-2 rounded font-bold text-xs border transition-colors ${
+                    writeInputValue === 'true' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-slate-100 text-slate-700 border-slate-300'
                   }`}
                 >
                   LIGAR (TRUE)
                 </button>
                 <button
                   onClick={() => setWriteInputValue('false')}
-                  className={`py-2 rounded font-mono text-xs font-bold border transition-colors ${
-                    writeInputValue === 'false' ? 'bg-red-600 text-white border-red-500' : 'bg-slate-800 text-slate-300 border-slate-700'
+                  className={`py-2 rounded font-bold text-xs border transition-colors ${
+                    writeInputValue === 'false' ? 'bg-red-600 text-white border-red-600' : 'bg-slate-100 text-slate-700 border-slate-300'
                   }`}
                 >
                   DESLIGAR (FALSE)
@@ -342,27 +289,27 @@ export const SynopticCanvas: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-1">
-                <label className="text-xs font-mono text-slate-300">Novo Valor Desejado ({selectedTagForWrite.unit}):</label>
+                <label className="text-xs font-medium text-slate-700">Novo Valor Desejado ({selectedTagForWrite.unit}):</label>
                 <input
                   type="number"
                   step="0.1"
                   value={writeInputValue}
                   onChange={(e) => setWriteInputValue(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-sm font-mono text-slate-100 focus:outline-none focus:border-sky-500"
+                  className="w-full border border-slate-300 rounded p-2 text-sm font-mono text-slate-900 focus:outline-none focus:border-slate-500"
                 />
               </div>
             )}
 
-            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-isa-border">
+            <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
               <button
                 onClick={() => setSelectedTagForWrite(null)}
-                className="px-4 py-2 rounded text-xs font-mono text-slate-400 hover:text-slate-200"
+                className="px-4 py-2 rounded text-xs font-medium text-slate-600 hover:bg-slate-100"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleExecuteWrite}
-                className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-mono font-semibold shadow transition-colors"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold shadow-xs transition-colors"
               >
                 Confirmar & Escrever
               </button>

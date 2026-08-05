@@ -11,8 +11,11 @@ import { AlarmCenter } from './components/views/AlarmCenter';
 import { AiReportStudio } from './components/views/AiReportStudio';
 import { SettingsView } from './components/views/SettingsView';
 
+import { DatabaseTestView } from './components/views/DatabaseTestView';
+
 export function App() {
-  const { activeView, updateTelemetryTick, isSimulatingTelemetry } = useSupervisoryStore();
+  const { activeView, updateTelemetryTick, isSimulatingTelemetry, theme } = useSupervisoryStore();
+  const isLight = theme === 'light';
 
   // Telemetry Polling Loop (Simulates 10Hz Modbus/MQTT Data Stream)
   useEffect(() => {
@@ -25,13 +28,15 @@ export function App() {
   }, [isSimulatingTelemetry, updateTelemetryTick]);
 
   return (
-    <div className="min-h-screen bg-isa-bg text-isa-text flex flex-col font-sans">
+    <div className={`min-h-screen flex flex-col font-sans transition-colors ${
+      isLight ? 'bg-white text-slate-900' : 'bg-isa-bg text-isa-text'
+    }`}>
       <Header />
 
       <div className="flex flex-1">
         <Sidebar />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className={`flex-1 overflow-y-auto ${isLight ? 'bg-white' : 'bg-isa-bg'}`}>
           {activeView === 'synoptic' && <SynopticCanvas />}
           {activeView === 'overview' && <OverviewDashboard />}
           {activeView === 'hierarchy' && <HierarchyManager />}
@@ -39,11 +44,13 @@ export function App() {
           {activeView === 'tags' && <TagManager />}
           {activeView === 'alarms' && <AlarmCenter />}
           {activeView === 'ai-reports' && <AiReportStudio />}
+          {activeView === 'db-test' && <DatabaseTestView />}
           {activeView === 'settings' && <SettingsView />}
         </main>
       </div>
     </div>
   );
 }
+
 
 export default App;
